@@ -33,7 +33,7 @@ export const LoginForm = () => {
       headerTitle="Welcome back"
       headerLabel="Please enter your details"
       backButtonLabel="Don't have an account? Sign up"
-      backButtonHref="/signup"
+      backButtonHref="/auth/signup"
       showSocial
       auth
     >

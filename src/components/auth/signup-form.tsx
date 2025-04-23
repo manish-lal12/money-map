@@ -33,7 +33,7 @@ export const SignupForm = () => {
       headerTitle="Ready to start your exciting journey ?"
       headerLabel="Signup to our website and start leading through your meta life today!"
       backButtonLabel="Already have an account? Login"
-      backButtonHref="/login"
+      backButtonHref="/auth/login"
       showSocial
       auth
     >

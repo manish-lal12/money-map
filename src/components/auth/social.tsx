@@ -20,7 +20,7 @@ export const Social = () => {
           size="lg"
           className="flex-1 cursor-pointer"
           variant="outline"
-          onClick={() => signIn("google")}
+          onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
         >
           <FcGoogle size={24} />
         </Button>

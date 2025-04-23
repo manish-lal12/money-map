@@ -11,7 +11,7 @@ export const signupSchema = z.object({
     .string()
     .regex(
       new RegExp(
-        "^(?=.*[a-z])(?=.*[A-Z])(?=.*d)(?=.*[@$!%*?&])[A-Za-zd@$!%*?&]{8,}$"
+        "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$"
       ),
       "Minimum eight characters, at least one uppercase letter, one lowercase letter, one number and one special character"
     ),
