@@ -1,10 +1,13 @@
-
-import React from 'react';
+import React from "react";
 import { Input } from "@/components/ui/input";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { BadgeIndianRupee, ChevronDown } from 'lucide-react';
-import { formatCurrency } from '@/utils/financialUtils';
-import { useTaxData } from '../TaxDataContext';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { BadgeIndianRupee, ChevronDown } from "lucide-react";
+import { formatCurrency } from "@/utils/financialUtils";
+import { useTaxData } from "../TaxDataContext";
 
 const Section80C: React.FC = () => {
   const {
@@ -20,7 +23,7 @@ const Section80C: React.FC = () => {
     setTuitionFees,
     otherEightyC,
     setOtherEightyC,
-    section80C
+    section80C,
   } = useTaxData();
 
   return (
@@ -34,7 +37,9 @@ const Section80C: React.FC = () => {
       </CollapsibleTrigger>
       <CollapsibleContent className="space-y-4 pt-2 pl-4">
         <div>
-          <label className="block text-sm font-medium mb-1">EPF Contribution</label>
+          <label className="block text-sm font-medium mb-1">
+            EPF Contribution
+          </label>
           <Input
             type="number"
             value={epfContribution}
@@ -43,7 +48,9 @@ const Section80C: React.FC = () => {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium mb-1">PPF Investment</label>
+          <label className="block text-sm font-medium mb-1">
+            PPF Investment
+          </label>
           <Input
             type="number"
             value={ppfInvestment}
@@ -52,7 +59,9 @@ const Section80C: React.FC = () => {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium mb-1">ELSS Investment</label>
+          <label className="block text-sm font-medium mb-1">
+            ELSS Investment
+          </label>
           <Input
             type="number"
             value={elssInvestment}
@@ -61,7 +70,9 @@ const Section80C: React.FC = () => {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium mb-1">Life Insurance Premium</label>
+          <label className="block text-sm font-medium mb-1">
+            Life Insurance Premium
+          </label>
           <Input
             type="number"
             value={lifeInsurance}
@@ -70,7 +81,9 @@ const Section80C: React.FC = () => {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium mb-1">Children's Tuition Fees</label>
+          <label className="block text-sm font-medium mb-1">
+            Children&apos;s Tuition Fees
+          </label>
           <Input
             type="number"
             value={tuitionFees}
@@ -79,7 +92,9 @@ const Section80C: React.FC = () => {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium mb-1">Other 80C Investments</label>
+          <label className="block text-sm font-medium mb-1">
+            Other 80C Investments
+          </label>
           <Input
             type="number"
             value={otherEightyC}
@@ -87,12 +102,16 @@ const Section80C: React.FC = () => {
             placeholder="NSC, SCSS, Tax-saving FD, etc."
           />
         </div>
-        
+
         <div className="pt-2 flex justify-between items-center">
           <span className="text-sm">Total 80C Claimed:</span>
-          <span className={`font-medium ${section80C >= 150000 ? 'text-finance-green' : ''}`}>
-            {formatCurrency(section80C)} 
-            {section80C >= 150000 && ' (Limit reached)'}
+          <span
+            className={`font-medium ${
+              section80C >= 150000 ? "text-finance-green" : ""
+            }`}
+          >
+            {formatCurrency(section80C)}
+            {section80C >= 150000 && " (Limit reached)"}
           </span>
         </div>
       </CollapsibleContent>

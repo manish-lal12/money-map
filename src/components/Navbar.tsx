@@ -3,25 +3,23 @@
 import React from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Wallet, User, Bell } from "lucide-react";
+import { Wallet, User } from "lucide-react";
 import Link from "next/link";
 
-import { useSession, signIn, signOut } from "next-auth/react";
+import { useSession } from "next-auth/react";
 
 interface NavbarProps {
   className?: string;
 }
 
 const Navbar: React.FC<NavbarProps> = ({ className }) => {
-  const { data: session, status } = useSession();
-
   return (
     <header className={cn("border-b border-border", className)}>
       <div className="container mx-auto px-4 py-3 flex items-center justify-between">
         <div className="flex items-center">
           <Wallet className="h-6 w-6 text-finance-blue mr-2" />
           <h1 className="text-xl font-bold text-finance-blue cursor-pointer">
-            <a href="/">Money Map</a>
+            <Link href="/">Money Map</Link>
           </h1>
         </div>
 

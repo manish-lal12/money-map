@@ -31,7 +31,7 @@ const TestimonialCard = ({
           ))}
         </div>
 
-        <p className="text-wealth-deep-blue italic">"{quote}"</p>
+        <p className="text-wealth-deep-blue italic">&quot;{quote}&quot;</p>
 
         <div className="flex items-center space-x-3">
           <img

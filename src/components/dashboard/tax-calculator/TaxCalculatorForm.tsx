@@ -1,19 +1,7 @@
 import React from "react";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { Calculator, CheckCircle2 } from "lucide-react";
-import { cn } from "@/lib/utils";
 import TaxRegimeSelector from "./TaxRegimeSelector";
 import IncomeSection from "./form-sections/IncomeSection";
 import DeductionsSection from "./form-sections/DeductionsSection";

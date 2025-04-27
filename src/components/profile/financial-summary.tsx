@@ -1,10 +1,4 @@
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-  CardDescription,
-} from "../ui/card";
+import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
 import { BsCashStack } from "react-icons/bs";
 import { TrendingUp, TrendingDown } from "lucide-react";
 import { MdOutlineSavings } from "react-icons/md";

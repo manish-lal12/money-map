@@ -1,12 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Card } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
-import { Calculator } from "lucide-react";
 import TaxCalculatorForm from "./TaxCalculatorForm";
 import TaxCalculatorResults from "./TaxCalculatorResults";
 import UserInfoSection from "./UserInfoSection";
-import { formatCurrency } from "@/utils/financialUtils";
 import { TaxDataProvider } from "./TaxDataContext";
 
 const TaxCalculator: React.FC = () => {

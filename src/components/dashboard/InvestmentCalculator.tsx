@@ -6,12 +6,10 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { formatCurrency, calculateSIPReturns } from "@/utils/financialUtils";
-import FinancialChart from "./dashboard/FinancialChart";
 import {
   LineChart,
   Line,
@@ -21,13 +19,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import {
-  CreditCard,
-  Landmark,
-  Calculator,
-  AlertCircle,
-  TrendingUp,
-} from "lucide-react";
+import { CreditCard, Landmark, Calculator, TrendingUp } from "lucide-react";
 
 const InvestmentCalculator: React.FC = () => {
   // SIP Calculator
@@ -536,7 +528,7 @@ const InvestmentCalculator: React.FC = () => {
                       <CreditCard className="h-5 w-5 text-finance-green" />
                     </div>
                     <div>
-                      <h4 className="font-medium">Child's Education</h4>
+                      <h4 className="font-medium">Child&apos;s Education</h4>
                       <p className="text-sm text-muted-foreground">
                         Saving for higher education expenses
                       </p>

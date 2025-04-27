@@ -8,18 +8,8 @@ import {
 } from "@/components/ui/card";
 import StatCard from "./StatCard";
 import FinancialChart from "./FinancialChart";
-import {
-  formatCurrency,
-  sampleTransactions,
-  expenseCategories,
-} from "@/utils/financialUtils";
-import {
-  ArrowUpRight,
-  Wallet,
-  CreditCard,
-  Landmark,
-  PiggyBank,
-} from "lucide-react";
+import { formatCurrency, sampleTransactions } from "@/utils/financialUtils";
+import { ArrowUpRight, Wallet, CreditCard, PiggyBank } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const DashboardOverview: React.FC = () => {

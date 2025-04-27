@@ -1,12 +1,4 @@
-import {
-  BarChart3,
-  TrendingUp,
-  Shield,
-  Clock,
-  Smartphone,
-  Bell,
-  LineChart,
-} from "lucide-react";
+import { BarChart3, TrendingUp, Shield, Bell, LineChart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Footer from "@/components/landing-page/footer";
 import FeatureCard from "@/components/landing-page/feature-card";

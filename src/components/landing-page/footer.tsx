@@ -1,6 +1,5 @@
 import { FaXTwitter } from "react-icons/fa6";
-import { MdEmail } from "react-icons/md";
-import { FaGithub, FaFacebook, FaInstagram, FaPhone } from "react-icons/fa";
+import { FaGithub, FaFacebook, FaInstagram } from "react-icons/fa";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

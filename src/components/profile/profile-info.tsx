@@ -28,7 +28,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
@@ -49,7 +49,7 @@ import { getProfile, updateProfile } from "@/app/actions/profile";
 export type ProfileFormValues = z.infer<typeof profileSchema>;
 
 export function ProfileInfo() {
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
   const { toast } = useToast();
 
   const [isEditing, setIsEditing] = useState(false);
@@ -77,7 +77,7 @@ export function ProfileInfo() {
             email: user?.email as string,
             image: user?.image as string,
             bio: user?.bio || "",
-            dob: user?.dob!,
+            dob: user?.dob || undefined,
             phone: user?.phone || "",
             address: user?.address || "",
           });
@@ -149,7 +149,7 @@ export function ProfileInfo() {
                     height={80}
                     width={200}
                   />
-                  {/* <AvatarFallback>AJ</AvatarFallback> */}
+                  <AvatarFallback>AJ</AvatarFallback>/
                 </Avatar>
               )}
               <Button variant="outline" size="sm" className="mt-2">

@@ -1,5 +1,3 @@
-import { formatCurrency } from "./financialUtils";
-
 type AgeGroup = "below60" | "60to80" | "above80";
 
 /**
