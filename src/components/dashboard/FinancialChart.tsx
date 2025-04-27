@@ -22,7 +22,7 @@ import { cn } from "@/lib/utils";
 interface ChartData {
   name: string;
   value: number;
-  [key: string]: string | number;
+  [key: string]: any;
 }
 
 interface FinancialChartProps {
