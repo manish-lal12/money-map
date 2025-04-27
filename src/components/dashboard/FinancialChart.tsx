@@ -22,7 +22,7 @@ import { cn } from "@/lib/utils";
 interface ChartData {
   name: string;
   value: number;
-  [key: string]: any;
+  [key: string]: string | number;
 }
 
 interface FinancialChartProps {
@@ -110,7 +110,11 @@ const FinancialChart: React.FC<FinancialChartProps> = ({
                 {data.map((entry, index) => (
                   <Cell
                     key={`cell-${index}`}
-                    fill={entry.color || colors[index % colors.length]}
+                    fill={
+                      typeof entry.color === "string"
+                        ? entry.color
+                        : colors[index % colors.length]
+                    }
                   />
                 ))}
               </Pie>

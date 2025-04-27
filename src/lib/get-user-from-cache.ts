@@ -1,4 +1,4 @@
-import redis from "@/lib/redis";
+import { redis } from "@/lib/redis";
 
 export async function getUserFromCache(userId: string) {
   const user = await redis.hgetall(`user:${userId}`);
