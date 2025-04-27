@@ -20,18 +20,18 @@ export default {
   callbacks: {
     authorized: async ({ auth, request: { nextUrl } }) => {
       console.log("auth", auth);
-      const isLoggedIn = !!auth?.user;
-      const isProtected = nextUrl.pathname.startsWith("/home");
-      if (isProtected) {
-        if (isLoggedIn) {
-          return true;
-        }
-        return false;
+      const isAuthenticated = !!auth?.user;
+
+      const protectedRoutes = ["/home", "/profile", "/dashboard", "/settings"];
+      const isProtected = protectedRoutes.some((route) =>
+        nextUrl.pathname.startsWith(route)
+      );
+
+      if (isProtected && !isAuthenticated) {
+        return Response.redirect(new URL("/auth/login", nextUrl.origin));
       }
+
       return true;
     },
-  },
-  pages: {
-    signIn: "/login",
   },
 } satisfies NextAuthConfig;

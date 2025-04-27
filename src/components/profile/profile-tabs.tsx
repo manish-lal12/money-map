@@ -1,12 +1,14 @@
 "use client";
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PageHeader } from "@/components/page-header";
-import { ProfileInfo } from "@/components/profile-info";
-import { FinancialSummary } from "@/components/financial-summary";
-import { SecuritySettings } from "@/components/security-settings";
+import { ProfileInfo } from "@/components/profile/profile-info";
+import { FinancialSummary } from "@/components/profile/financial-summary";
+import { SecuritySettings } from "@/components/profile/security-settings";
 import { useState } from "react";
+import { Toaster } from "@/components/ui/toaster";
 
-export default function ProfilePage() {
+export default function ProfileTabs() {
   const [activeTab, setActiveTab] = useState("profile");
 
   return (
@@ -37,6 +39,7 @@ export default function ProfilePage() {
             <SecuritySettings />
           </TabsContent>
         </Tabs>
+        <Toaster />
       </div>
     </>
   );

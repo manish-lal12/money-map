@@ -1,14 +1,20 @@
+"use client";
+
 import React from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Wallet, User, Bell } from "lucide-react";
 import Link from "next/link";
 
+import { useSession, signIn, signOut } from "next-auth/react";
+
 interface NavbarProps {
   className?: string;
 }
 
 const Navbar: React.FC<NavbarProps> = ({ className }) => {
+  const { data: session, status } = useSession();
+
   return (
     <header className={cn("border-b border-border", className)}>
       <div className="container mx-auto px-4 py-3 flex items-center justify-between">
@@ -47,9 +53,9 @@ const Navbar: React.FC<NavbarProps> = ({ className }) => {
         </nav>
 
         <div className="flex items-center space-x-4">
-          <Button variant="ghost" size="icon" className="rounded-full">
+          {/* <Button variant="ghost" size="icon" className="rounded-full">
             <Bell className="h-5 w-5" />
-          </Button>
+          </Button> */}
 
           <Link href="/profile">
             <Button variant="ghost" size="icon" className="rounded-full">

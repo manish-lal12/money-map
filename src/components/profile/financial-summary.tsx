@@ -1,81 +1,16 @@
-import React, { useState, useCallback } from "react";
-import {
-  BarChart,
-  Bar,
-  Cell,
-  Tooltip,
-  CartesianAxis,
-  XAxis,
-  YAxis,
-} from "recharts";
 import {
   Card,
   CardHeader,
   CardTitle,
   CardContent,
   CardDescription,
-} from "./ui/card";
+} from "../ui/card";
 import { BsCashStack } from "react-icons/bs";
-import { IoIosTrendingDown } from "react-icons/io";
 import { TrendingUp, TrendingDown } from "lucide-react";
 import { MdOutlineSavings } from "react-icons/md";
 import { TbTax } from "react-icons/tb";
 
-interface CustomTooltipProps {
-  active?: boolean;
-  payload?: any[];
-  label?: string;
-}
-
-const data = [
-  {
-    year: "2014",
-    taxReturns: 4000,
-    savings: 10000,
-  },
-  {
-    year: "2015",
-    taxReturns: 8200,
-    savings: 10000,
-  },
-  {
-    year: "2016",
-    taxReturns: 7000,
-    savings: 10000,
-  },
-  {
-    year: "2017",
-    taxReturns: 8200,
-    savings: 10000,
-  },
-  {
-    year: "2017",
-    taxReturns: 9000,
-    savings: 10000,
-  },
-  {
-    year: "2018",
-    taxReturns: 12000,
-    savings: 10000,
-  },
-  {
-    year: "2019",
-    taxReturns: 15000,
-    savings: 10000,
-  },
-];
-
 export const FinancialSummary = () => {
-  const [activeIndex, setActiveIndex] = useState(data.length - 1);
-  const activeItem = data[activeIndex];
-
-  const handleClick = useCallback(
-    (entry: any, index: number) => {
-      setActiveIndex(index);
-    },
-    [setActiveIndex]
-  );
-
   return (
     <div className="space-y-6">
       <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">

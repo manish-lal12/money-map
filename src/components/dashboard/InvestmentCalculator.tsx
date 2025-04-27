@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { formatCurrency, calculateSIPReturns } from "@/utils/financialUtils";
-import FinancialChart from "./FinancialChart";
+import FinancialChart from "./dashboard/FinancialChart";
 import {
   LineChart,
   Line,

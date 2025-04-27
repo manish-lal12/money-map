@@ -16,6 +16,10 @@ model User {
     password      String?
     accounts      Account[]
     sessions      Session[]
+    dob           DateTime?
+    phone         String?
+    address       String?
+    bio           String?
 
     // Optional for WebAuthn support
     Authenticator Authenticator[]

@@ -8,7 +8,6 @@ import {
   LineChart,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import Navbar from "@/components/navbar-landing-page";
 import Footer from "@/components/landing-page/footer";
 import FeatureCard from "@/components/landing-page/feature-card";
 import TestimonialCard from "@/components/landing-page/testimonal-card";
@@ -111,8 +110,6 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen gradient-bg">
-      <Navbar />
-
       <ScrollToTopButton />
 
       {/* Hero Section */}

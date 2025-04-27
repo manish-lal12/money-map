@@ -1,13 +1,17 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import DashboardOverview from "@/components/DashboardOverview";
-import ExpenseTracker from "@/components/ExpenseTracker";
-import InvestmentCalculator from "@/components/InvestmentCalculator";
-import TaxCalculator from "@/components/TaxCalculator";
+import DashboardOverview from "@/components/dashboard/dashboard-overview";
+import ExpenseTracker from "@/components/dashboard/ExpenseTracker";
+import InvestmentCalculator from "@/components/dashboard/InvestmentCalculator";
+import TaxCalculator from "@/components/dashboard/tax-calculator/TaxCalculator";
 
-export default function DashboardPage() {
+export const metadata = {
+  title: "Dashboard",
+};
+
+export default function DashboardTabs() {
   const [activeTab, setActiveTab] = useState<string>("dashboard");
 
   return (

@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { format } from "date-fns";
 import { CalendarIcon, Pencil, Upload } from "lucide-react";
+import { FaCheckCircle } from "react-icons/fa";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -34,45 +35,88 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { useToast } from "@/hooks/use-toast";
+
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
-const profileFormSchema = z.object({
-  name: z.string().min(2, {
-    message: "Name must be at least 2 characters.",
-  }),
-  email: z.string().email({
-    message: "Please enter a valid email address.",
-  }),
-  bio: z.string().max(160).optional(),
-  dob: z.date({
-    required_error: "A date of birth is required.",
-  }),
-  phone: z.string().optional(),
-  address: z.string().optional(),
-});
+import { profileSchema } from "@/schemas";
+import { useSession } from "next-auth/react";
+import { isEqual } from "@/utils/is-equal";
 
-type ProfileFormValues = z.infer<typeof profileFormSchema>;
+import { getProfile, updateProfile } from "@/app/actions/profile";
 
-const defaultValues: Partial<ProfileFormValues> = {
-  name: "Alex Johnson",
-  email: "alex.johnson@example.com",
-  bio: "Financial enthusiast with a passion for smart investing and long-term wealth building.",
-  dob: new Date("1985-08-15"),
-  phone: "+1 (555) 123-4567",
-  address: "123 Financial St, Money City, CA 94103",
-};
+export type ProfileFormValues = z.infer<typeof profileSchema>;
 
 export function ProfileInfo() {
-  const [isEditing, setIsEditing] = useState(false);
+  const { data: session, status } = useSession();
+  const { toast } = useToast();
 
-  const form = useForm<ProfileFormValues>({
-    resolver: zodResolver(profileFormSchema),
-    defaultValues,
+  const [isEditing, setIsEditing] = useState(false);
+  const [userDetails, setUserDetails] = useState<ProfileFormValues>({
+    name: "",
+    email: "",
+    image: "",
+    bio: "",
+    dob: undefined,
+    phone: "",
+    address: "",
   });
 
+  useEffect(() => {
+    if (session?.user?.email) {
+      getProfile(session.user.email)
+        .then((res) => {
+          if (res.error) {
+            console.error(res.message);
+            return;
+          }
+          const user = res.user;
+          setUserDetails({
+            name: user?.name as string,
+            email: user?.email as string,
+            image: user?.image as string,
+            bio: user?.bio || "",
+            dob: user?.dob!,
+            phone: user?.phone || "",
+            address: user?.address || "",
+          });
+        })
+        .catch((error) => {
+          console.error("Error fetching user profile:", error);
+        });
+    }
+  }, [session]);
+
+  const form = useForm<ProfileFormValues>({
+    resolver: zodResolver(profileSchema),
+    defaultValues: userDetails,
+  });
+  useEffect(() => {
+    // Update the form default values whenever userDetails changes
+    form.reset(userDetails);
+  }, [userDetails, form]);
+
+  const formValues = form.watch();
+
+  const isChanged = useMemo(() => {
+    return !isEqual(formValues, userDetails);
+  }, [formValues, userDetails]);
+
   function onSubmit(data: ProfileFormValues) {
-    // In a real app, you would save the data to the server here
-    console.log(data);
+    if (isChanged) {
+      updateProfile(data);
+      toast({
+        title: (
+          <div className="flex items-center">
+            <span>Successfully updated</span>
+            <FaCheckCircle className="ml-2 h-4 w-4" />
+          </div>
+        ),
+        description: "Your profile has been updated successfully.",
+        variant: "default",
+      });
+    }
     setIsEditing(false);
   }
 
@@ -81,7 +125,7 @@ export function ProfileInfo() {
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <div>
+            <div className="space-y-1">
               <CardTitle>Personal Information</CardTitle>
               <CardDescription>Update your personal details</CardDescription>
             </div>
@@ -97,13 +141,17 @@ export function ProfileInfo() {
         <CardContent>
           <div className="flex flex-col md:flex-row gap-6">
             <div className="flex flex-col items-center space-y-2">
-              <Avatar className="h-28 w-28">
-                <AvatarImage
-                  src="/placeholder-user.jpg"
-                  alt="Profile picture"
-                />
-                <AvatarFallback>AJ</AvatarFallback>
-              </Avatar>
+              {userDetails.image && (
+                <Avatar className="h-28 w-28">
+                  <Image
+                    src={userDetails.image as string}
+                    alt="Profile picture"
+                    height={80}
+                    width={200}
+                  />
+                  {/* <AvatarFallback>AJ</AvatarFallback> */}
+                </Avatar>
+              )}
               <Button variant="outline" size="sm" className="mt-2">
                 <Upload className="mr-2 h-4 w-4" />
                 Change Photo
@@ -245,7 +293,9 @@ export function ProfileInfo() {
                       >
                         Cancel
                       </Button>
-                      <Button type="submit">Save Changes</Button>
+                      <Button type="submit" disabled={!isChanged}>
+                        Save Changes
+                      </Button>
                     </div>
                   )}
                 </form>
