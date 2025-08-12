@@ -27,6 +27,24 @@ export const profileSchema = z.object({
   image: z.string(),
   bio: z.string().max(160).optional(),
   dob: z.date().optional(),
-  phone: z.string().optional(),
+  phone: z
+    .string()
+    .max(10, { message: "Phone number cannot be more than 10 digits" })
+    .optional(),
   address: z.string().optional(),
+});
+
+export const welcomeFormSchema = z.object({
+  totalAssets: z.number().min(0, {
+    message: "Total assets must be a positive number.",
+  }),
+  monthlyIncome: z.number().min(0, {
+    message: "Monthly income must be a positive number.",
+  }),
+  monthlyExpenses: z.number().min(0, {
+    message: "Monthly expenses must be a positive number.",
+  }),
+  savingsGoal: z.number().min(0, {
+    message: "Savings goal must be a positive number.",
+  }),
 });

@@ -8,9 +8,9 @@ generator client {
 }
 
 model User {
-    id            String    @id @default(cuid())
+    id            String          @id @default(cuid())
     name          String?
-    email         String    @unique
+    email         String          @unique
     emailVerified DateTime?
     image         String?
     password      String?
@@ -20,12 +20,106 @@ model User {
     phone         String?
     address       String?
     bio           String?
-
+    isOnboarded   Boolean         @default(false)
     // Optional for WebAuthn support
     Authenticator Authenticator[]
 
+    createdAt      DateTime         @default(now())
+    updatedAt      DateTime         @updatedAt
+    Assets         Assets[]
+    Savings        Savings[]
+    TaxReturns     TaxReturns[]
+    Transactions   Transactions[]
+    Investments    Investments[]
+    FinancialGoals FinancialGoals[]
+}
+
+model FinancialGoals {
+    id          String        @id @default(cuid())
+    userId      String
+    user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+    title       String
+    description String?
+    amount      Float
+    // duration in years(5yrs, 10yrs)
+    duration    Int
+    Investments Investments[]
+}
+
+model Investments {
+    id        String          @id @default(cuid())
+    userId    String
+    user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+    name      String
+    amount    Float
+    goalId    String? // optional FK
+    goal      FinancialGoals? @relation(fields: [goalId], references: [id], onDelete: SetNull)
+    createdAt DateTime        @default(now())
+    updatedAt DateTime        @updatedAt
+}
+
+model Assets {
+    id        String   @id @default(cuid())
+    userId    String
+    user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    name      String
+    amount    Float
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
+}
+
+model Savings {
+    id        String   @id @default(cuid())
+    userId    String
+    user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    amount    Float
+    // accept year, month, day to filter out
+    date      DateTime
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model TaxReturns {
+    id        String   @id @default(cuid())
+    userId    String
+    user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    year      Int
+    amount    Float
+    // accept year
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+enum TransactionType {
+    income
+    expense
+}
+
+enum Category {
+    income
+    housing
+    food
+    utilities
+    entertainment
+    investment
+    travel
+    healthcare
+    insurance
+    education
+    miscellaneous
+}
+
+model Transactions {
+    id          String          @id @default(cuid())
+    userId      String
+    user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+    type        TransactionType
+    category    Category
+    amount      Float
+    description String
+    date        DateTime
+    createdAt   DateTime        @default(now())
+    updatedAt   DateTime        @updatedAt
 }
 
 model Account {

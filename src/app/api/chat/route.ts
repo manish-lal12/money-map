@@ -1,6 +1,6 @@
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
-import axios from 'axios';
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import axios from "axios";
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
@@ -8,16 +8,16 @@ export async function POST(req: NextRequest) {
 
   try {
     const response = await axios.post(
-      'https://openrouter.ai/api/v1/chat/completions',
+      "https://openrouter.ai/api/v1/chat/completions",
       {
-        model: 'openai/gpt-3.5-turbo',
-        messages: [{ role: 'user', content: message }],
+        model: "openai/gpt-3.5-turbo",
+        messages: [{ role: "user", content: message }],
       },
       {
         headers: {
           Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
-          'HTTP-Referer': 'https://your-site.com',
-          'X-Title': 'Money Map',
+          "HTTP-Referer": "https://your-site.com",
+          "X-Title": "Money Map",
         },
       }
     );
@@ -26,6 +26,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ reply });
   } catch (error: any) {
     console.error(error.response?.data || error.message);
-    return NextResponse.json({ error: 'Chat API failed' }, { status: 500 });
+    return NextResponse.json({ error: "Chat API failed" }, { status: 500 });
   }
 }

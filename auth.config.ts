@@ -3,6 +3,7 @@ import Github from "next-auth/providers/github";
 import Credentials from "next-auth/providers/credentials";
 
 import type { NextAuthConfig } from "next-auth";
+import { prisma } from "@/lib/db";
 
 // Notice this is only an object, not a full Auth.js instance
 export default {
@@ -18,17 +19,60 @@ export default {
   ],
   trustHost: true,
   callbacks: {
-    authorized: async ({ auth, request: { nextUrl } }) => {
-      console.log("auth", auth);
-      const isAuthenticated = !!auth?.user;
+    async jwt({ token, trigger, session, user }) {
+      // runs only when the user is created, not on every session access
+      if (user?.email) {
+        const dbUser = await prisma.user.findUnique({
+          where: {
+            email: user.email,
+          },
+        });
+        token.isOnboarded = dbUser?.isOnboarded ?? false;
+      }
+      if (trigger === "update") {
+        if (session?.isOnboarded) {
+          token.isOnboarded = session.isOnboarded;
+        }
+      }
+      return token;
+    },
 
-      const protectedRoutes = ["/home", "/profile", "/dashboard", "/settings"];
+    async session({ session, token }) {
+      if (session.user) {
+        session.user.isOnboarded = token.isOnboarded;
+      }
+      return session;
+    },
+
+    // this callback is called whenever a session is checked, and runs on edge
+    authorized: async ({ auth, request: { nextUrl } }) => {
+      const isAuthenticated = !!auth?.user;
+      const isOnboarded = auth?.user?.isOnboarded ?? false;
+
+      const protectedRoutes = ["/profile", "/onboarding", "/dashboard"];
       const isProtected = protectedRoutes.some((route) =>
         nextUrl.pathname.startsWith(route)
       );
 
       if (isProtected && !isAuthenticated) {
         return Response.redirect(new URL("/auth/login", nextUrl.origin));
+      }
+
+      // enforce onboarding
+      if (
+        isAuthenticated &&
+        !isOnboarded &&
+        nextUrl.pathname !== "/onboarding"
+      ) {
+        return Response.redirect(new URL("/onboarding", nextUrl.origin));
+      }
+
+      if (
+        isAuthenticated &&
+        isOnboarded &&
+        nextUrl.pathname === "/onboarding"
+      ) {
+        return Response.redirect(new URL("/dashboard", nextUrl.origin));
       }
 
       return true;

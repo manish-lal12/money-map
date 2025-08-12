@@ -9,6 +9,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { formatCurrency, calculateSIPReturns } from "@/utils/financialUtils";
 import {
   LineChart,
@@ -20,8 +22,15 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { CreditCard, Landmark, Calculator, TrendingUp } from "lucide-react";
+import { FinancialGoal } from "@/lib/get-dashboard-data";
 
-const InvestmentCalculator: React.FC = () => {
+interface InvestmentCalculatorProps {
+  dashboardFinancialGoalsData: FinancialGoal[];
+}
+
+const InvestmentCalculator: React.FC<InvestmentCalculatorProps> = ({
+  dashboardFinancialGoalsData,
+}) => {
   // SIP Calculator
   const [sipAmount, setSipAmount] = useState<number>(10000);
   const [sipDuration, setSipDuration] = useState<number>(10);
@@ -36,6 +45,19 @@ const InvestmentCalculator: React.FC = () => {
   const [goalReturn, setGoalReturn] = useState<number>(12);
   const [requiredMonthlyInvestment, setRequiredMonthlyInvestment] =
     useState<number>(0);
+
+  // Financial Goals
+  const [goals, setGoals] = useState<FinancialGoal[] | []>(
+    dashboardFinancialGoalsData
+  );
+  const [newGoal, setNewGoal] = useState({
+    title: "",
+    description: "",
+    amount: 0,
+    duration: 0,
+  });
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     // Calculate SIP results
@@ -59,6 +81,36 @@ const InvestmentCalculator: React.FC = () => {
 
     setRequiredMonthlyInvestment(Math.round(monthlyInvestment));
   }, [sipAmount, sipDuration, sipReturn, goalAmount, goalDuration, goalReturn]);
+
+  const handleCreateGoal = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch("/api/goals", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newGoal),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to create goal");
+      }
+
+      const data = await response.json();
+      setGoals([...goals, data.goal]);
+      setNewGoal({ title: "", description: "", amount: 0, duration: 0 });
+    } catch (err: any) {
+      setError(err.message);
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // Generate year-by-year growth data for SIP
   const getSIPGrowthData = () => {
@@ -102,9 +154,10 @@ const InvestmentCalculator: React.FC = () => {
       <h2 className="text-2xl font-bold">Investment Planning</h2>
 
       <Tabs defaultValue="sip" className="w-full">
-        <TabsList className="grid grid-cols-2 mb-6">
+        <TabsList className="grid grid-cols-3 mb-6">
           <TabsTrigger value="sip">SIP Calculator</TabsTrigger>
           <TabsTrigger value="goal">Goal-based Planning</TabsTrigger>
+          <TabsTrigger value="my-goals">My Goals</TabsTrigger>
         </TabsList>
 
         <TabsContent value="sip" className="space-y-6">
@@ -528,7 +581,7 @@ const InvestmentCalculator: React.FC = () => {
                       <CreditCard className="h-5 w-5 text-finance-green" />
                     </div>
                     <div>
-                      <h4 className="font-medium">Child&apos;s Education</h4>
+                      <h4 className="font-medium">Child's Education</h4>
                       <p className="text-sm text-muted-foreground">
                         Saving for higher education expenses
                       </p>
@@ -581,6 +634,121 @@ const InvestmentCalculator: React.FC = () => {
                     </Button>
                   </div>
                 </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="my-goals" className="space-y-6">
+          <div className="grid gap-6 md:grid-cols-2">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Create New Goal</CardTitle>
+                <CardDescription>
+                  Add a new financial goal to track your progress
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleCreateGoal} className="space-y-4">
+                  <div>
+                    <label className="text-sm font-medium">Goal Title</label>
+                    <Input
+                      value={newGoal.title}
+                      onChange={(e) =>
+                        setNewGoal({ ...newGoal, title: e.target.value })
+                      }
+                      placeholder="e.g., Buy a Car"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium">Description</label>
+                    <Textarea
+                      value={newGoal.description}
+                      onChange={(e) =>
+                        setNewGoal({ ...newGoal, description: e.target.value })
+                      }
+                      placeholder="Describe your goal"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium">Amount (₹)</label>
+                    <Input
+                      type="number"
+                      value={newGoal.amount}
+                      onChange={(e) =>
+                        setNewGoal({
+                          ...newGoal,
+                          amount: e.target.value
+                            ? parseFloat(e.target.value)
+                            : 0,
+                        })
+                      }
+                      placeholder="e.g., 500000"
+                      min={1000}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium">
+                      Duration (Years)
+                    </label>
+                    <Input
+                      type="number"
+                      value={newGoal.duration}
+                      onChange={(e) =>
+                        setNewGoal({
+                          ...newGoal,
+                          duration: e.target.value
+                            ? parseInt(e.target.value)
+                            : 0,
+                        })
+                      }
+                      placeholder="e.g., 5"
+                      min={1}
+                      required
+                    />
+                  </div>
+                  {error && <p className="text-sm text-red-500">{error}</p>}
+                  <Button type="submit" disabled={isLoading}>
+                    {isLoading ? "Creating..." : "Create Goal"}
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Your Goals</CardTitle>
+                <CardDescription>
+                  List of your saved financial goals
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {isLoading ? (
+                  <p>Loading goals...</p>
+                ) : goals.length === 0 ? (
+                  <p>No goals found. Create one to get started!</p>
+                ) : (
+                  <div className="space-y-4">
+                    {goals.map((goal) => (
+                      <div
+                        key={goal.id}
+                        className="p-4 rounded-lg border border-border"
+                      >
+                        <h4 className="font-medium">{goal.title}</h4>
+                        <p className="text-sm text-muted-foreground">
+                          {goal.description}
+                        </p>
+                        <div className="mt-2 text-sm">
+                          <p>Amount: {formatCurrency(goal.amount)}</p>
+                          <p>Duration: {goal.duration} years</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>

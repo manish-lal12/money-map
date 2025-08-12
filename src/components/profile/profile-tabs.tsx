@@ -7,8 +7,17 @@ import { FinancialSummary } from "@/components/profile/financial-summary";
 import { SecuritySettings } from "@/components/profile/security-settings";
 import { useState } from "react";
 import { Toaster } from "@/components/ui/toaster";
+import type { UserProfile, FinancialGoal } from "@/lib/get-dashboard-data";
 
-export default function ProfileTabs() {
+interface ProfileTabsProps {
+  userProfileDetails: UserProfile;
+  userFinancialGoals: FinancialGoal[];
+}
+
+export default function ProfileTabs({
+  userProfileDetails,
+  userFinancialGoals,
+}: ProfileTabsProps) {
   const [activeTab, setActiveTab] = useState("profile");
 
   return (
@@ -30,7 +39,10 @@ export default function ProfileTabs() {
             <TabsTrigger value="security">Security</TabsTrigger>
           </TabsList>
           <TabsContent value="profile" className="space-y-4">
-            <ProfileInfo />
+            <ProfileInfo
+              userProfileDetails={userProfileDetails}
+              userFinancialGoals={userFinancialGoals}
+            />
           </TabsContent>
           <TabsContent value="financial" className="space-y-4">
             <FinancialSummary />

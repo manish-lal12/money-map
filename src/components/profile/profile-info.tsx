@@ -3,7 +3,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { format } from "date-fns";
 import { CalendarIcon, Pencil, Upload } from "lucide-react";
 import { FaCheckCircle } from "react-icons/fa";
@@ -41,59 +40,38 @@ import { cn } from "@/lib/utils";
 import Image from "next/image";
 
 import { profileSchema } from "@/schemas";
-import { useSession } from "next-auth/react";
 import { isEqual } from "@/utils/is-equal";
+import Link from "next/link";
 
-import { getProfile, updateProfile } from "@/app/actions/profile";
+import { updateProfile } from "@/app/actions/profile";
+import { formatCurrency } from "@/utils/financialUtils";
+import type { UserProfile, FinancialGoal } from "@/lib/get-dashboard-data";
 
-export type ProfileFormValues = z.infer<typeof profileSchema>;
+interface ProfileInfoProps {
+  userProfileDetails: UserProfile;
+  userFinancialGoals: FinancialGoal[];
+}
 
-export function ProfileInfo() {
-  const { data: session } = useSession();
+export function ProfileInfo({
+  userProfileDetails,
+  userFinancialGoals,
+}: ProfileInfoProps) {
   const { toast } = useToast();
 
   const [isEditing, setIsEditing] = useState(false);
-  const [userDetails, setUserDetails] = useState<ProfileFormValues>({
-    name: "",
-    email: "",
-    image: "",
-    bio: "",
-    dob: undefined,
-    phone: "",
-    address: "",
+  const [userDetails, setUserDetails] = useState<UserProfile>({
+    ...userProfileDetails,
+    address: userProfileDetails.address || "",
+    bio: userProfileDetails.bio || "",
+    phone: userProfileDetails.phone || "",
   });
 
-  useEffect(() => {
-    if (session?.user?.email) {
-      getProfile(session.user.email)
-        .then((res) => {
-          if (res.error) {
-            console.error(res.message);
-            return;
-          }
-          const user = res.user;
-          setUserDetails({
-            name: user?.name as string,
-            email: user?.email as string,
-            image: user?.image as string,
-            bio: user?.bio || "",
-            dob: user?.dob || undefined,
-            phone: user?.phone || "",
-            address: user?.address || "",
-          });
-        })
-        .catch((error) => {
-          console.error("Error fetching user profile:", error);
-        });
-    }
-  }, [session]);
-
-  const form = useForm<ProfileFormValues>({
+  const form = useForm<UserProfile>({
     resolver: zodResolver(profileSchema),
     defaultValues: userDetails,
   });
+
   useEffect(() => {
-    // Update the form default values whenever userDetails changes
     form.reset(userDetails);
   }, [userDetails, form]);
 
@@ -103,21 +81,31 @@ export function ProfileInfo() {
     return !isEqual(formValues, userDetails);
   }, [formValues, userDetails]);
 
-  function onSubmit(data: ProfileFormValues) {
+  async function onSubmit(data: UserProfile) {
     if (isChanged) {
-      updateProfile(data);
-      toast({
-        title: (
-          <div className="flex items-center">
-            <span>Successfully updated</span>
-            <FaCheckCircle className="ml-2 h-4 w-4" />
-          </div>
-        ),
-        description: "Your profile has been updated successfully.",
-        variant: "default",
-      });
+      const response = await updateProfile(data);
+      console.log(response);
+
+      if (response.error) {
+        toast({
+          title: "Error",
+          description: "Failed to update profile.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: (
+            <div className="flex items-center">
+              <span>Successfully updated</span>
+              <FaCheckCircle className="ml-2 h-4 w-4" />
+            </div>
+          ),
+          description: "Your profile has been updated successfully.",
+          variant: "default",
+        });
+      }
+      setIsEditing(false);
     }
-    setIsEditing(false);
   }
 
   return (
@@ -141,7 +129,7 @@ export function ProfileInfo() {
         <CardContent>
           <div className="flex flex-col md:flex-row gap-6">
             <div className="flex flex-col items-center space-y-2">
-              {userDetails.image && (
+              {userDetails?.image && (
                 <Avatar className="h-28 w-28">
                   <Image
                     src={userDetails.image as string}
@@ -149,7 +137,7 @@ export function ProfileInfo() {
                     height={80}
                     width={200}
                   />
-                  <AvatarFallback>AJ</AvatarFallback>/
+                  <AvatarFallback>AJ</AvatarFallback>
                 </Avatar>
               )}
               <Button variant="outline" size="sm" className="mt-2">
@@ -311,59 +299,36 @@ export function ProfileInfo() {
           <CardDescription>Your personal financial objectives</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            <div className="border rounded-lg p-4">
-              <h3 className="font-medium mb-2">Retirement</h3>
-              <p className="text-sm text-muted-foreground mb-2">
-                Save $1.5M for retirement by age 65
-              </p>
-              <div className="flex items-center">
-                <div className="w-full bg-muted rounded-full h-2.5 mr-2">
-                  <div
-                    className="bg-primary h-2.5 rounded-full"
-                    style={{ width: "35%" }}
-                  ></div>
+          {!userFinancialGoals ? (
+            <p>Loading goals...</p>
+          ) : userFinancialGoals.length === 0 ? (
+            <p>
+              No goals found. Create some goals in the Investment Planning
+              section.
+            </p>
+          ) : (
+            <div className="space-y-4">
+              {userFinancialGoals.map((goal) => (
+                <div key={goal.id} className="border rounded-lg p-4">
+                  <h3 className="font-medium mb-2">{goal.title}</h3>
+                  <p className="text-sm text-muted-foreground mb-2">
+                    {goal.description} - Save {formatCurrency(goal.amount)} in{" "}
+                    {goal.duration} years
+                  </p>
+                  <div className="flex items-center">
+                    <div className="w-full bg-muted rounded-full h-2.5 mr-2">
+                      <div
+                        className="bg-primary h-2.5 rounded-full"
+                        style={{ width: "0%" }} // Placeholder: No progress data available
+                      ></div>
+                    </div>
+                    <span className="text-sm font-medium">0%</span>
+                  </div>
                 </div>
-                <span className="text-sm font-medium">35%</span>
-              </div>
+              ))}
             </div>
-            <div className="border rounded-lg p-4">
-              <h3 className="font-medium mb-2">Home Purchase</h3>
-              <p className="text-sm text-muted-foreground mb-2">
-                Save $100K for down payment on a house by 2025
-              </p>
-              <div className="flex items-center">
-                <div className="w-full bg-muted rounded-full h-2.5 mr-2">
-                  <div
-                    className="bg-primary h-2.5 rounded-full"
-                    style={{ width: "65%" }}
-                  ></div>
-                </div>
-                <span className="text-sm font-medium">65%</span>
-              </div>
-            </div>
-            <div className="border rounded-lg p-4">
-              <h3 className="font-medium mb-2">Education Fund</h3>
-              <p className="text-sm text-muted-foreground mb-2">
-                Save $50K for children's education by 2030
-              </p>
-              <div className="flex items-center">
-                <div className="w-full bg-muted rounded-full h-2.5 mr-2">
-                  <div
-                    className="bg-primary h-2.5 rounded-full"
-                    style={{ width: "20%" }}
-                  ></div>
-                </div>
-                <span className="text-sm font-medium">20%</span>
-              </div>
-            </div>
-          </div>
+          )}
         </CardContent>
-        <CardFooter>
-          <Button variant="outline" className="w-full">
-            Manage Financial Goals
-          </Button>
-        </CardFooter>
       </Card>
     </div>
   );

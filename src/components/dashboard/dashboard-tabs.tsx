@@ -6,12 +6,27 @@ import DashboardOverview from "@/components/dashboard/dashboard-overview";
 import ExpenseTracker from "@/components/dashboard/ExpenseTracker";
 import InvestmentCalculator from "@/components/dashboard/InvestmentCalculator";
 import TaxCalculator from "@/components/dashboard/tax-calculator/TaxCalculator";
+import {
+  DashboardOverviewData,
+  TransactionData,
+  FinancialGoal,
+} from "@/lib/get-dashboard-data";
 
 export const metadata = {
   title: "Dashboard",
 };
 
-export default function DashboardTabs() {
+interface DashboardTabsProps {
+  dashboardOverviewData: DashboardOverviewData;
+  dashboardTransactionsData: TransactionData;
+  dashboardFinancialGoalsData: FinancialGoal[];
+}
+
+export default function DashboardTabs({
+  dashboardOverviewData,
+  dashboardTransactionsData,
+  dashboardFinancialGoalsData,
+}: DashboardTabsProps) {
   const [activeTab, setActiveTab] = useState<string>("dashboard");
 
   return (
@@ -31,15 +46,19 @@ export default function DashboardTabs() {
           </TabsList>
 
           <TabsContent value="dashboard">
-            <DashboardOverview />
+            <DashboardOverview dashboardOverviewData={dashboardOverviewData} />
           </TabsContent>
 
           <TabsContent value="expenses">
-            <ExpenseTracker />
+            <ExpenseTracker
+              dashboardTransactionsData={dashboardTransactionsData}
+            />
           </TabsContent>
 
           <TabsContent value="investments">
-            <InvestmentCalculator />
+            <InvestmentCalculator
+              dashboardFinancialGoalsData={dashboardFinancialGoalsData}
+            />
           </TabsContent>
 
           <TabsContent value="tax">

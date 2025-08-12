@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+"use client"; // Ensures this is client-side
+
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,97 +19,53 @@ import {
 } from "@/utils/financialUtils";
 import { useToast } from "@/components/ui/use-toast";
 import { Calendar, Wallet, Plus, ArrowUpRight } from "lucide-react";
+import { getDashboardData, Transaction } from "@/lib/get-dashboard-data";
+import { useForm } from "react-hook-form";
+import type { TransactionData } from "@/lib/get-dashboard-data";
 
-interface Transaction {
-  id: number;
-  date: string;
-  description: string;
-  amount: number;
-  type: "income" | "expense";
-  category: string;
+interface ExpenseTrackerProps {
+  dashboardTransactionsData: TransactionData;
 }
 
-const ExpenseTracker: React.FC = () => {
-  const { toast } = useToast();
-  const [transactions, setTransactions] = useState<Transaction[]>([
-    {
-      id: 1,
-      date: new Date().toISOString(),
-      description: "Salary",
-      amount: 100000,
-      type: "income",
-      category: "Income",
-    },
-    {
-      id: 2,
-      date: new Date().toISOString(),
-      description: "Rent",
-      amount: 25000,
-      type: "expense",
-      category: "Housing",
-    },
-    {
-      id: 3,
-      date: new Date().toISOString(),
-      description: "Groceries",
-      amount: 6000,
-      type: "expense",
-      category: "Food",
-    },
-    {
-      id: 4,
-      date: new Date().toISOString(),
-      description: "Electricity Bill",
-      amount: 3000,
-      type: "expense",
-      category: "Utilities",
-    },
-    {
-      id: 5,
-      date: new Date().toISOString(),
-      description: "Mobile Bill",
-      amount: 1000,
-      type: "expense",
-      category: "Utilities",
-    },
-    {
-      id: 6,
-      date: new Date().toISOString(),
-      description: "Mutual Fund SIP",
-      amount: 10000,
-      type: "expense",
-      category: "Investments",
-    },
-    {
-      id: 7,
-      date: new Date().toISOString(),
-      description: "Movie",
-      amount: 1500,
-      type: "expense",
-      category: "Entertainment",
-    },
-  ]);
+const ExpenseTracker: React.FC<ExpenseTrackerProps> = ({
+  dashboardTransactionsData,
+}) => {
+  console.log(dashboardTransactionsData);
+  const {
+    transactions: transactionDetails,
+    expensesByCategoryData,
+    monthlyOverviewData,
+  } = dashboardTransactionsData;
 
+  const { toast } = useToast();
+  const form = useForm();
+
+  const [transactions, setTransactions] = useState<Transaction[] | []>(
+    transactionDetails
+  );
   const [newTransaction, setNewTransaction] = useState({
     description: "",
     amount: "",
     type: "expense",
     date: new Date().toISOString().slice(0, 10),
   });
+  const [monthlyTransactionData, setMonthlyTransactionData] = useState<
+    TransactionData["monthlyOverviewData"] | []
+  >(monthlyOverviewData);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setNewTransaction((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleTypeChange = (value: string) => {
+  const handleTypeChange = (value: Transaction["type"]) => {
     setNewTransaction((prev) => ({
       ...prev,
-      type: value as "income" | "expense",
+      type: value,
     }));
   };
 
-  const handleAddTransaction = () => {
+  const handleAddTransaction = async () => {
     if (!newTransaction.description || !newTransaction.amount) {
       toast({
         title: "Missing information",
@@ -129,91 +87,74 @@ const ExpenseTracker: React.FC = () => {
 
     const category =
       newTransaction.type === "income"
-        ? "Income"
+        ? "income"
         : categorizeTransaction(newTransaction.description);
 
-    const transaction: Transaction = {
-      id: Date.now(),
-      date: new Date(newTransaction.date).toISOString(),
+    const transactionData = {
       description: newTransaction.description,
+      date: newTransaction.date,
       amount: amount,
-      type: newTransaction.type as "income" | "expense",
+      type: newTransaction.type,
       category: category,
     };
-
-    setTransactions((prev) => [transaction, ...prev]);
-
-    setNewTransaction({
-      description: "",
-      amount: "",
-      type: "expense",
-      date: new Date().toISOString().slice(0, 10),
-    });
-
-    toast({
-      title: "Transaction added",
-      description: "Your transaction has been recorded successfully",
-    });
+    try {
+      const response = await fetch("/api/expenses", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(transactionData),
+      });
+      const newTransactionResponse = await response.json();
+      setTransactions((prev) => [newTransactionResponse, ...prev]);
+      setNewTransaction({
+        description: "",
+        amount: "",
+        type: "expense",
+        date: new Date().toISOString().slice(0, 10),
+      });
+      toast({
+        title: "Transaction added",
+        description: "Your transaction has been recorded successfully",
+      });
+    } catch (error) {
+      console.error("Error adding transaction:", error);
+      toast({
+        title: "Error",
+        description: "Failed to add transaction. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
-  const expenseByCategory = transactions
-    .filter((t) => t.type === "expense")
-    .reduce<Record<string, number>>((acc, transaction) => {
-      const category = transaction.category;
-      acc[category] = (acc[category] || 0) + transaction.amount;
-      return acc;
-    }, {});
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        const dashboardData = await fetch("/api/dashboard");
+        const response = await dashboardData.json();
+        console.log(response);
 
-  const expenseByCategoryData = Object.entries(expenseByCategory).map(
-    ([name, value]) => {
-      const categoryColor =
-        expenseCategories.find((c) => c.name === name)?.color || "#6C757D";
-      return { name, value, color: categoryColor };
-    }
-  );
-
-  const monthNames = [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
-  ];
-  const currentMonth = new Date().getMonth();
-  const last6Months = Array.from({ length: 6 }, (_, i) => {
-    const monthIndex = (currentMonth - i + 12) % 12;
-    return { month: monthIndex, name: monthNames[monthIndex] };
-  }).reverse();
-
-  const monthlyExpenseData = last6Months.map(({ month, name }) => {
-    const totalExpense = transactions
-      .filter((t) => {
-        const transactionDate = new Date(t.date);
-        return transactionDate.getMonth() === month && t.type === "expense";
-      })
-      .reduce((sum, t) => sum + t.amount, 0);
-
-    const totalIncome = transactions
-      .filter((t) => {
-        const transactionDate = new Date(t.date);
-        return transactionDate.getMonth() === month && t.type === "income";
-      })
-      .reduce((sum, t) => sum + t.amount, 0);
-
-    return {
-      name,
-      expenses: totalExpense,
-      income: totalIncome,
-      value: totalExpense,
+        if (!response) {
+          toast({
+            title: "Error",
+            description: "Failed to fetch dashboard data",
+            variant: "destructive",
+          });
+          return;
+        }
+        const { monthlyOverviewData } = response;
+        setMonthlyTransactionData(monthlyOverviewData);
+      } catch (error) {
+        console.error("Error fetching dashboard data:", error);
+        toast({
+          title: "Error",
+          description: "Failed to fetch dashboard data",
+          variant: "destructive",
+        });
+      }
     };
-  });
+    fetchDashboardData();
+  }, [transactions]);
 
   return (
     <div className="space-y-8">
@@ -288,7 +229,7 @@ const ExpenseTracker: React.FC = () => {
         <FinancialChart
           title="Monthly Expenses & Income"
           type="bar"
-          data={monthlyExpenseData}
+          data={monthlyTransactionData}
           dataKey="expenses"
           additionalDataKeys={["income"]}
           colors={["#FF9500", "#0466C8"]}
@@ -297,7 +238,7 @@ const ExpenseTracker: React.FC = () => {
         <FinancialChart
           title="Expense Breakdown"
           type="pie"
-          data={expenseByCategoryData}
+          data={expensesByCategoryData}
         />
       </div>
 
@@ -330,11 +271,14 @@ const ExpenseTracker: React.FC = () => {
                     <p className="font-medium">{transaction.description}</p>
                     <div className="flex items-center text-xs text-muted-foreground">
                       <Calendar className="h-3 w-3 mr-1" />
-                      {new Date(transaction.date).toLocaleDateString("en-IN", {
-                        day: "numeric",
-                        month: "short",
-                        year: "numeric",
-                      })}
+                      {new Date(transaction.date as Date).toLocaleDateString(
+                        "en-IN",
+                        {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                        }
+                      )}
                       <span className="mx-1">•</span>
                       {transaction.category}
                     </div>
