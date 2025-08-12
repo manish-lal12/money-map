@@ -64,17 +64,16 @@ npm run dev
 ## 📂 Project Structure
 
 moneymap/
-│── prisma/ # Prisma schema & migrations
-│── public/ # Static assets (icons, images, etc.)
-│── src/
-│ ├── app/ # App Router pages & layouts
-│ ├── components/ # Reusable UI components
-│ ├── lib/ # Utility functions
-│ ├── styles/ # Global styles
-│ ├── api/ # API routes for auth & finance data
-│── .env # Environment variables
-│── package.json
-│── README.md
+├── prisma/         # Prisma schema & migrations
+├── public/         # Static assets (icons, images, etc.)
+├── src/
+│   ├── app/        # App Router pages, layouts, and API routes
+│   ├── components/   # Reusable UI components
+│   ├── lib/        # Utility functions (database client, helpers)
+│   └── styles/     # Global styles and Tailwind CSS config
+├── .env    # Local environment variables (untracked)
+├── package.json
+└── README.md
 
 
 ---
