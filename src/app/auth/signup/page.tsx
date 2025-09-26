@@ -6,7 +6,7 @@ import signUpImage from "../../../../public/signup.jpg";
 export default function SignupPage() {
   return (
     <div className="flex justify-between">
-      <div className="absolute">Moneymap</div>
+      <div className="absolute text-2xl font-bold p-4">Moneymap</div>
       <div className="flex flex-col justify-center items-center w-1/2 h-screen">
         <SignupForm />
       </div>

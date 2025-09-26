@@ -1,6 +1,7 @@
-import { BarChart3, TrendingUp, Shield, Bell, LineChart } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import Image from "next/image";
 import Footer from "@/components/landing-page/footer";
+import { Button } from "@/components/ui/button";
+import { BarChart3, TrendingUp, Shield, Bell, LineChart } from "lucide-react";
 import FeatureCard from "@/components/landing-page/feature-card";
 import TestimonialCard from "@/components/landing-page/testimonal-card";
 import StepCard from "@/components/landing-page/step-card";

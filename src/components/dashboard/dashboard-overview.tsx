@@ -106,7 +106,7 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({
                     <div>
                       <p className="font-medium">{transaction.description}</p>
                       <p className="text-xs text-muted-foreground">
-                        {new Date(transaction.date).toLocaleDateString(
+                        {new Date(transaction.date!).toLocaleDateString(
                           "en-IN",
                           {
                             day: "numeric",

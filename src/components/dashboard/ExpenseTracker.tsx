@@ -19,7 +19,7 @@ import {
 } from "@/utils/financialUtils";
 import { useToast } from "@/components/ui/use-toast";
 import { Calendar, Wallet, Plus, ArrowUpRight } from "lucide-react";
-import { getDashboardData, Transaction } from "@/lib/get-dashboard-data";
+import { Transaction } from "@/lib/get-dashboard-data";
 import { useForm } from "react-hook-form";
 import type { TransactionData } from "@/lib/get-dashboard-data";
 

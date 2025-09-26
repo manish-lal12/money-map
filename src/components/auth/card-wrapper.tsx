@@ -36,11 +36,10 @@ export const CardWrapper = ({
       }
     >
       <CardHeader>
-        <Header
-          title={headerTitle}
-          label={headerLabel}
-          {...(auth ? { auth } : {})}
-        />
+        <h1 className="text-2xl font-bold">{headerTitle}</h1>
+        <p>{headerLabel}</p>
+
+        {/* <Header label="" {...(auth ? { auth } : {})} /> */}
       </CardHeader>
       <CardContent>{children}</CardContent>
       {showSocial && (
